@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="jar" name="OpenClassicAPI">
+	<property name="binary.version" value="2.0-SNAPSHOT"/>
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="OpenClassicAPI.classpath">
+        <pathelement location="bin"/>
+    	<fileset dir="ext/opennbt">
+	    	<include name="*.jar"/>
+	 	</fileset>
+        <pathelement location="ext/snakeyaml/snakeyaml-1.10.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+    	<mkdir dir="target"/>
+    	<copy todir="ext/opennbt">
+	        <fileset dir="../OpenNBT/target" includes="*.jar" />
+	    </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src/main/java">
+                <exclude name="**/*.ucls"/>
+                <exclude name="**/*.useq"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    	<delete dir="target"/>
+    	<delete file="ext/opennbt/*.jar"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-project" name="build"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src/main/java"/>
+            <classpath refid="OpenClassicAPI.classpath"/>
+        </javac>
+    </target>
+	
+	<target name="jar" description="package a jar" depends="cleanall, build">
+		<jar destfile="target/openclassicapi-${binary.version}.jar" basedir="bin" duplicate="preserve">
+			<zipgroupfileset dir="ext">
+				<include name="**/*.jar"/>
+	            <exclude name="**/*-sources.jar"/>
+	            <exclude name="**/*-javadoc.jar"/>
+			</zipgroupfileset>
+			<manifest>
+				<attribute name="Implementation-Version" value="${binary.version}" />
+			</manifest>
+		</jar>
+	</target>
+	
+</project>
